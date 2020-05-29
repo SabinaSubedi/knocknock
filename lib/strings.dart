@@ -1,7 +1,9 @@
 class Strings {
   static const String APP_TITLE             = 'Medicad';
   static const String ORG_NAME              = 'Sagar Tamang';
+  static const String LOGIN                 = 'Login';
   static const String EMAIL                 = 'Email';
+  static const String DASHBOARD             = 'Dashboard';
   static const String PHONE_NUMBER          = 'Phone Number';
   static const String PASSWORD              = 'Password';
   static const String SIGN_IN               = 'Sign In';

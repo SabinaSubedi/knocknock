@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "871198382492",
+    "firebase_url": "https://medicad-2fe36.firebaseio.com",
+    "project_id": "medicad-2fe36",
+    "storage_bucket": "medicad-2fe36.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871198382492:android:e8c7f2bd90ca3b47d99059",
+        "android_client_info": {
+          "package_name": "com.example.medicad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "871198382492-73fpmrm4d0i7e9v1m38to8cm9kb6j49j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.medicad",
+            "certificate_hash": "e22b6edcef3bff7cf53b8a1a2051d485d3e1f8d8"
+          }
+        },
+        {
+          "client_id": "871198382492-gm3i3j2u330snl16fb71dnus2i252gg5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA16m6sbu3safn1cfooCo2LQDhC7ZksY_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "871198382492-gm3i3j2u330snl16fb71dnus2i252gg5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

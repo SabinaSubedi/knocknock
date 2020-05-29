@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:medicad/screens/signup.dart';
+import 'package:medicad/services/auth.dart';
 import 'package:medicad/strings.dart';
 
 class LoginScreen extends StatelessWidget {
   String verificationId;
-  final _formKey                  = GlobalKey<FormState>();
-  final phoneNumberTextController = TextEditingController();
+  CountryCode countryCode               = CountryCode.fromCode('NP');
+  final       _formKey                  = GlobalKey<FormState>();
+  final       phoneNumberTextController = TextEditingController();
   
   @override
   Widget build(BuildContext context) {
@@ -49,7 +51,9 @@ class LoginScreen extends StatelessWidget {
                   Row(
                     children: <Widget>[                      
                       CountryCodePicker(                    
-                        onChanged: print,
+                        onChanged: (CountryCode countryCode) {
+                          this.countryCode = countryCode;
+                        },
                         initialSelection: 'NP',
                         favorite: ['+977','NP'],
                         showCountryOnly: false,
@@ -82,6 +86,7 @@ class LoginScreen extends StatelessWidget {
                   RaisedButton(
                     onPressed: () async {
                       final String phoneNumber = phoneNumberTextController.text;
+                      verifyPhone(countryCode.dialCode + phoneNumber);
                     },
                     child: const Text(
                       Strings.SIGN_IN,
@@ -95,17 +100,6 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(
                     height: 50.0,
                   ),
-
-                  FlatButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignUpScreen() ),
-                      );
-                    },
-                    child: const Text(Strings.CREATE_AN_ACCOUNT),
-                    color: Colors.grey.shade300,
-                  ),
                 ]
             )
           )
@@ -114,9 +108,9 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Future<void> verifyPhone(phone_nubmer) async {
-    final PhoneVerificationCompleted phoneVerificationCompleted = (AuthCredential authResult) {
-      // TODO Verify phone completed.
+  Future<void> verifyPhone(String phoneNumber) async {
+    final PhoneVerificationCompleted phoneVerificationCompleted = (AuthCredential authCredential) {
+      AuthService().signIn(authCredential);
     };
 
     final PhoneVerificationFailed phoneVerificationFailed = (AuthException authException) {
@@ -132,8 +126,8 @@ class LoginScreen extends StatelessWidget {
     };
 
     await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: phone_nubmer,
-      timeout: const Duration( seconds: 10),
+      phoneNumber: phoneNumber,
+      timeout: const Duration( seconds: 60),
       verificationCompleted: phoneVerificationCompleted,
       verificationFailed: phoneVerificationFailed,
       codeSent: phoneCodeSent,
