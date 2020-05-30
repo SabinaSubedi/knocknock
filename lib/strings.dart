@@ -1,12 +1,14 @@
 class Strings {
   static const String APP_TITLE             = 'Medicad';
-  static const String ORG_NAME              = 'Sagar Tamang';
+  static const String ORG_NAME              = 'Sabina Subedi';
   static const String LOGIN                 = 'Login';
   static const String EMAIL                 = 'Email';
   static const String DASHBOARD             = 'Dashboard';
   static const String PHONE_NUMBER          = 'Phone Number';
   static const String PASSWORD              = 'Password';
   static const String SIGN_IN               = 'Sign In';
+  static const String CHAT                  = 'Chat';
+  static const String ACCOUNT               = 'Account';
   static const String CREATE_AN_ACCOUNT     = 'Create an account';
   static const String SIGN_IN_WITH_GOOGLE   = 'Sign In with Google';
   static const String SIGN_IN_WITH_FACEBOOK = 'Sign In with Facebook';

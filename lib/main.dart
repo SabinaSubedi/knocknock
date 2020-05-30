@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:country_code_picker/country_localizations.dart';
+import 'package:medicad/screens/dashboard.dart';
+import 'package:medicad/notifiers/app_title.dart';
 import 'package:medicad/services/auth.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(
+  MultiProvider(
+    providers: [
+      ChangeNotifierProvider( create: (_) => AppTitleNotifier()),
+    ],
+    child: MyApp()
+  )
+);
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       supportedLocales: [
           Locale('en'),
           Locale('it'),
@@ -25,7 +38,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: AuthService().handleAuth(),
+      // home: AuthService().handleAuth(),
+      home: DashboardScreen()
     );
   }
 }
