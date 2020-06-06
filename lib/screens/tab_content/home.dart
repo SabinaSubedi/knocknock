@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:medicad/notifiers/app_title.dart';
+import 'package:medicad/strings.dart';
 
 class HomeTabContent extends StatelessWidget {
   @override
@@ -18,6 +19,7 @@ class HomeTabContent extends StatelessWidget {
             clipper: BackgroundClipper(),
           ),
 
+          // Application title
           Container(
             child: Text( 
               'Knock@Knock',
@@ -28,16 +30,82 @@ class HomeTabContent extends StatelessWidget {
               ),
             ),
             margin: EdgeInsets.symmetric(
-              vertical: screenSize.height * 0.03,
               horizontal: screenSize.width * 0.08
-              ),
-          )
-         
+            ),
+          ),
+
+          // Home items
+          Container(
+            margin: EdgeInsets.only(
+              left: screenSize.width * 0.08,
+              right: screenSize.width * 0.08,
+              top: screenSize.height * 0.08
+            ),
+            child: GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              crossAxisSpacing: 50.0,
+              mainAxisSpacing: 20.0,
+              children: _getHomeItems().map( ( HomeItem homeItem ) {
+                return Card(
+                  elevation: 10.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(25.0)
+                    )
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      IconButton(
+                        iconSize: 75.0,
+                        icon: Image.asset(
+                          homeItem.image
+                         ),
+                        onPressed: () => _handleHomeItemClick( homeItem ),
+                      ),
+                      Text(homeItem.title),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          )    
         ],
       )
     );
   }
+
+  /// Handle the home item click.
+  _handleHomeItemClick(HomeItem homeItem) {
+    var a = 1;
+  }
+
+  /// Get list of home items.
+  List<HomeItem> _getHomeItems() {
+    List<HomeItem> homeItems = List<HomeItem>();
+    homeItems.add( HomeItem(image: 'assets/images/stethoscope.png', title: Strings.CONSULT_DOCTOR));
+    homeItems.add( HomeItem(image: 'assets/images/music.png', title: Strings.MUSIC));
+    homeItems.add( HomeItem(image: 'assets/images/video.png', title: Strings.VIDEO));
+    homeItems.add( HomeItem(image: 'assets/images/games.png', title: Strings.GAMES));
+    homeItems.add( HomeItem(image: 'assets/images/faq.png', title: Strings.FAQ));
+    return homeItems;
+  }
 }
+
+// HomeItem class.
+class HomeItem {
+  String image;
+  String title;
+
+  HomeItem( {
+    @required this.image,
+    @required this.title,
+  });
+}
+
+/// Custom background clipper.
 class BackgroundClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

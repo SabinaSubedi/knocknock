@@ -16,4 +16,11 @@ class Strings {
   static const String CREATE_NEW_USER       = 'Create a new user';
   static const String ENTER_SOME_TEXT       = 'Please enter some text';
   static const String NO_CONNECTION         = 'Something went wrong. Please check your internet connection.';
+  static const String MUSIC = 'Music';
+  static const String VIDEO = 'Video';
+  static const String GAMES = 'Games';
+  static const String FAQ = 'FAQ';
+  static const String CONSULT_DOCTOR = 'Consult a doctor';
+
+
 }
