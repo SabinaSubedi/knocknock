@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medicad/screens/music.dart';
 import 'package:provider/provider.dart';
 import 'package:medicad/notifiers/app_title.dart';
 import 'package:medicad/strings.dart';
@@ -63,7 +64,7 @@ class HomeTabContent extends StatelessWidget {
                         icon: Image.asset(
                           homeItem.image
                          ),
-                        onPressed: () => _handleHomeItemClick( homeItem ),
+                        onPressed: () => _handleHomeItemClick(context, homeItem),
                       ),
                       Text(homeItem.title),
                     ],
@@ -78,8 +79,16 @@ class HomeTabContent extends StatelessWidget {
   }
 
   /// Handle the home item click.
-  _handleHomeItemClick(HomeItem homeItem) {
-    var a = 1;
+  _handleHomeItemClick(BuildContext context, HomeItem homeItem) {
+    switch(homeItem.title) {
+      case Strings.MUSIC:
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) => MusicScreen()
+        ));
+        break;
+      default:
+        break;
+    }
   }
 
   /// Get list of home items.
