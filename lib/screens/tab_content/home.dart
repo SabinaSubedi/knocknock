@@ -37,6 +37,7 @@ class HomeTabContent extends StatelessWidget {
 
           // Home items
           Container(
+            height: double.infinity,
             margin: EdgeInsets.only(
               left: screenSize.width * 0.08,
               right: screenSize.width * 0.08,
