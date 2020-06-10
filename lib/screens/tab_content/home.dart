@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medicad/screens/music.dart';
+import 'package:medicad/screens/music_list.dart';
 import 'package:provider/provider.dart';
 import 'package:medicad/notifiers/app_title.dart';
 import 'package:medicad/strings.dart';
@@ -84,7 +84,7 @@ class HomeTabContent extends StatelessWidget {
     switch(homeItem.title) {
       case Strings.MUSIC:
         Navigator.push(context, MaterialPageRoute(
-          builder: (context) => MusicScreen()
+          builder: (context) => MusicListScreen()
         ));
         break;
       default:

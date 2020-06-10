@@ -1,109 +1,140 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:audioplayer/audioplayer.dart';
-import 'package:medicad/model/firebase_file.dart';
-import 'package:medicad/notifiers/music_list.dart';
-import 'package:medicad/strings.dart';
-import 'package:provider/provider.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class MusicScreen extends StatefulWidget {
+  final String title;
+  final String path;
+
+  MusicScreen({
+    @required this.title,
+    @required this.path
+  });
+
   @override
   _MusicScreenState createState() => _MusicScreenState();
 }
 
 class _MusicScreenState extends State<MusicScreen> {
-  AudioPlayer audioPlayer = AudioPlayer();
+  AudioPlayer _audioPlayer = AudioPlayer();
   FirebaseStorage firebaseStorage = FirebaseStorage.instance;
-  StorageReference storageReference = FirebaseStorage.instance.ref();
-  StreamSubscription<AudioPlayerState> audioPlayerStateSubscription;
-  
+  StorageReference _storageReference = FirebaseStorage.instance.ref();
+  StreamSubscription<AudioPlayerState> _audioPlayerStateSubscription;
+  StreamSubscription<Duration> _audioPlayerPositionSubscription;
+  Duration  _duration = Duration(seconds: 0);
+  Duration _position = Duration( seconds:  0 );
+  bool _mute = false;
+
   @override
   void initState() {
-    audioPlayerStateSubscription = audioPlayer.onPlayerStateChanged.listen((event) {
-      Provider.of<MusicListNotifier>(context, listen: false).setAudioPlayerState(event);
+    super.initState();
+    _audioPlayerStateSubscription = _audioPlayer.onPlayerStateChanged.listen((state) {
+        if (AudioPlayerState.PLAYING == state ) {
+          setState( () =>  _duration = _audioPlayer.duration );
+        } else if (state == AudioPlayerState.STOPPED) {
+          setState( () => _position = _duration );
+        }
     }, onError: (msg) {
-      Provider.of<MusicListNotifier>(context, listen: false).setAudioPlayerState(AudioPlayerState.STOPPED);
+      setState(() {
+        _duration = Duration(seconds: 0);
+        _position = Duration(seconds: 0);
+      });
+    });
+
+    _audioPlayerPositionSubscription = _audioPlayer.onAudioPositionChanged.listen((position) {
+      setState(() => _position = position );
     });
   }
 
   @override
   void dispose() {
+    _audioPlayerStateSubscription.cancel();
+    _audioPlayerPositionSubscription.cancel();
+    _audioPlayer.stop();
     super.dispose();
-    audioPlayerStateSubscription.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Strings.MUSIC),
+        title: Text(widget.title),
         centerTitle: true,
         elevation: 0.0,
       ),
       body: SafeArea(
-        child: FutureBuilder(
-          future: storageReference.child('music').listAll(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return Center(
-                child: CircularProgressIndicator()
-              );
-            } else {
-              List<FirebaseFile> files = List<FirebaseFile>();
-              snapshot.data['items'].forEach((key, item) => files.add(FirebaseFile(
-                name: key.replaceAll('.mp3',''),
-                path: item['path']
-              )));
+        child: Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: 50.0,
+            vertical: 0.0
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              // Music title.
+              Text(
+                widget.title, 
+                textAlign: TextAlign.center,
+                style: TextStyle( fontSize: 25.0, fontWeight: FontWeight.bold),
+              ),
 
-              Provider.of<MusicListNotifier>(context, listen: false).setMusicList( files );
-              
-              return Selector<MusicListNotifier, List<FirebaseFile>>(
-                selector: (context, musicList) => musicList.musicList,
-                builder: (context, musicList, child) {
-                  return ListView.builder(
-                    itemCount: files.length,
-                    itemBuilder: (context, index) {
-                      String name = files[index].name;
-                      return ListTile(
-                        leading: CircleAvatar(
-                          child: Text(name.substring(0,1)),
-                        ),
-                        title: Text(name),
-                        trailing: IconButton(
-                          icon: Selector<MusicListNotifier, AudioPlayerState>(
-                            selector: (context, musicList) => musicList.audioPlayerState,
-                            builder: (context, audioPlayerState, child) {
-                              int musicIndex = Provider.of<MusicListNotifier>(context, listen: false).currentMusicIndex;
-                              return FaIcon( audioPlayerState == AudioPlayerState.PLAYING && musicIndex == index ?  FontAwesomeIcons.solidPauseCircle : FontAwesomeIcons.solidPlayCircle );
-                            }
-                          ),
-                          onPressed: () => _playAudio(files[index].path, index ),
-                        )
-                      );
-                    }
-                  );
+              Slider(
+                value: _position?.inMilliseconds?.toDouble() ?? 0.0,
+                min: 0.0,
+                max: _duration.inMilliseconds.toDouble(),
+                onChanged: (double value) {
+                  _audioPlayer.seek((value / 1000).roundToDouble());
+                },
+              ),
+              // Player controls.
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    color: _audioPlayer.state == AudioPlayerState.PLAYING ? Colors.brown : Colors.green,
+                    icon: _audioPlayer.state == AudioPlayerState.PLAYING ? FaIcon(FontAwesomeIcons.solidPauseCircle) : FaIcon(FontAwesomeIcons.solidPlayCircle),
+                    iconSize: 75.0,
+                    onPressed: () => _playAudio(widget.path),
+                  ),
+                  IconButton(
+                    color: Colors.red,
+                    icon: FaIcon(FontAwesomeIcons.solidStopCircle),
+                    iconSize: 75.0,
+                    onPressed: () => _audioPlayer.stop(),
+                  ),
+                ],
+              ),
+
+              // Mute
+              IconButton(
+                icon: FaIcon(FontAwesomeIcons.volumeMute),
+                iconSize: 50.0,
+                color: _mute ? Colors.grey : Colors.black,
+                onPressed: () {
+                  setState(() {
+                    _mute = !_mute;
+                    _audioPlayer.mute(_mute);                    
+                  });
                 }
-              );
-            }
-          },
-        )
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  void _playAudio(String path, index ) async {
-    String url = await storageReference.child(path).getDownloadURL();
-    
-    AudioPlayerState audioPlayerState = Provider.of<MusicListNotifier>(context, listen: false).audioPlayerState;
-    Provider.of<MusicListNotifier>(context, listen: false).setCurrentMusicIndex(index);
-    if ( audioPlayerState != AudioPlayerState.PLAYING ) {
-      audioPlayer.stop();
-      audioPlayer.play(url);
+  void _playAudio(String path) async {
+    String url = await _storageReference.child(path).getDownloadURL();
+
+    if ( _audioPlayer.state != AudioPlayerState.PLAYING ) {
+      _audioPlayer.play(url);
     } else {
-      audioPlayer.pause();
+      _audioPlayer.pause();
+      setState(() {});
     }
   }
 }
