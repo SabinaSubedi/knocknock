@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medicad/screens/faq_list.dart';
 import 'package:medicad/screens/games.dart';
 import 'package:medicad/screens/music_list.dart';
+import 'package:medicad/screens/videos.dart';
 import 'package:provider/provider.dart';
 import 'package:medicad/notifiers/app_title.dart';
 import 'package:medicad/strings.dart';
@@ -89,14 +90,22 @@ class HomeTabContent extends StatelessWidget {
           builder: (context) => MusicListScreen()
         ));
         break;
-      case Strings.FAQ:
+
+      case Strings.FAQS:
         Navigator.push(context, MaterialPageRoute(
           builder: (context) => FAQListScreen()
         ));
         break;
+
       case Strings.GAMES:
         Navigator.push(context, MaterialPageRoute(
           builder: (context) => GamesScreen()
+        ));
+        break;
+
+      case Strings.VIDEOS:
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) => VideosScreen()
         ));
         break;
       default:
@@ -109,9 +118,9 @@ class HomeTabContent extends StatelessWidget {
     List<HomeItem> homeItems = List<HomeItem>();
     homeItems.add( HomeItem(image: 'assets/images/stethoscope.png', title: Strings.CONSULT_DOCTOR));
     homeItems.add( HomeItem(image: 'assets/images/music.png', title: Strings.MUSIC));
-    homeItems.add( HomeItem(image: 'assets/images/video.png', title: Strings.VIDEO));
+    homeItems.add( HomeItem(image: 'assets/images/video.png', title: Strings.VIDEOS));
     homeItems.add( HomeItem(image: 'assets/images/games.png', title: Strings.GAMES));
-    homeItems.add( HomeItem(image: 'assets/images/faq.png', title: Strings.FAQ));
+    homeItems.add( HomeItem(image: 'assets/images/faq.png', title: Strings.FAQS));
     return homeItems;
   }
 }
