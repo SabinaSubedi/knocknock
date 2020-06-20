@@ -5,12 +5,18 @@ import 'package:medicad/screens/signup.dart';
 import 'package:medicad/services/auth.dart';
 import 'package:medicad/strings.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   String verificationId;
-  CountryCode countryCode               = CountryCode.fromCode('NP');
-  final       _formKey                  = GlobalKey<FormState>();
-  final       phoneNumberTextController = TextEditingController();
-  
+  CountryCode countryCode = CountryCode.fromCode('NP');
+  final _formKey = GlobalKey<FormState>();
+  final phoneNumberTextController = TextEditingController();
+  bool _isLoggingIn = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,15 +94,9 @@ class LoginScreen extends StatelessWidget {
                       final String phoneNumber = phoneNumberTextController.text;
                       verifyPhone(countryCode.dialCode + phoneNumber);
                     },
-                    child: const Text(
-                      Strings.SIGN_IN,
-                      style: TextStyle(
-                        color: Colors.white
-                      ),
-                    ),
-                    color: Colors.blue
+                    child: _getSubmitButtonChild(),
+                    color: Colors.blue,
                   ),
-
                   SizedBox(
                     height: 50.0,
                   ),
@@ -108,13 +108,34 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
+  Widget _getSubmitButtonChild() {
+    if ( _isLoggingIn ) {
+      return  Padding(
+        padding: EdgeInsets.all(10.0),
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      );
+    } else {
+      return Text(
+        Strings.SIGN_IN,
+        style: TextStyle(
+          color: Colors.white
+        ),
+      );
+    }
+  }
   Future<void> verifyPhone(String phoneNumber) async {
+    setState(() => _isLoggingIn = true );
+
     final PhoneVerificationCompleted phoneVerificationCompleted = (AuthCredential authCredential) {
       AuthService().signIn(authCredential);
+      setState(() => _isLoggingIn = false );
     };
 
     final PhoneVerificationFailed phoneVerificationFailed = (AuthException authException) {
       print('${authException.message}');
+      setState(() => _isLoggingIn = false );
     };
 
     final PhoneCodeSent phoneCodeSent = (String verId, [int forceResend]) {
@@ -123,6 +144,7 @@ class LoginScreen extends StatelessWidget {
 
     final PhoneCodeAutoRetrievalTimeout autoRetrievalTimeout = (String verId) {
       this.verificationId = verId;
+      setState(() => _isLoggingIn = false );
     };
 
     await FirebaseAuth.instance.verifyPhoneNumber(

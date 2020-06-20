@@ -1,4 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:medicad/model/user.dart';
+import 'package:medicad/notifiers/profile_info.dart';
 import 'package:provider/provider.dart';
 import 'package:medicad/notifiers/app_title.dart';
 import 'package:medicad/screens/tab_content/home.dart';
@@ -11,7 +16,8 @@ class  DashboardScreen extends StatefulWidget {
   _DashboardScreenState createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProviderStateMixin{
+class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProviderStateMixin {
+  final StorageReference storageReference = FirebaseStorage().ref();
   BuildContext _context;
   TabController _tabController;
 
@@ -34,6 +40,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
           break;
         case 2:
           title = Strings.ACCOUNT;
+          _getProfileImage();
           break;
         default:
           title = '';
@@ -41,6 +48,25 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
       }
       Provider.of<AppTitleNotifier>(context, listen: false).setTitle(title);
     }
+  }
+
+  void _getProfileImage() async {
+    FirebaseUser _firebaseUser = await FirebaseAuth.instance.currentUser();
+    String profileImage = await storageReference.child('profile').child(_firebaseUser.uid).getDownloadURL();
+    var info = await Firestore.instance.collection('users').document(_firebaseUser.uid).get();
+
+    User user = User(
+      profileImage: profileImage,
+      firstName: info.data['firstName'] ?? '',
+      lastName: info.data['lastName'] ?? '',
+      gender: info.data['gender'] ?? '',
+      email: info.data['email'] ?? '',
+      address: info.data['address'] ?? '',
+      userType: info.data['userType'] ?? '',
+      doctorSpeciality: info.data['doctorSpeciality'] ?? '',
+    );
+
+    Provider.of<ProfileInfoNotifier>(context, listen: false).setUser(user);
   }
 
   @override

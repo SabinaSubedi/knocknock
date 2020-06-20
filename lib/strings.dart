@@ -21,6 +21,8 @@ class Strings {
   static const String GAMES = 'Games';
   static const String FAQ = 'FAQ';
   static const String CONSULT_DOCTOR = 'Consult a doctor';
-
+  static const String SAVE = 'Save';
+  static const String FIRST_NAME = 'First Name';
+  static const String LAST_NAME = 'Last Name';
 
 }
