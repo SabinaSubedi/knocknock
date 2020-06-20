@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medicad/screens/faq_list.dart';
+import 'package:medicad/screens/games.dart';
 import 'package:medicad/screens/music_list.dart';
 import 'package:provider/provider.dart';
 import 'package:medicad/notifiers/app_title.dart';
@@ -91,6 +92,11 @@ class HomeTabContent extends StatelessWidget {
       case Strings.FAQ:
         Navigator.push(context, MaterialPageRoute(
           builder: (context) => FAQListScreen()
+        ));
+        break;
+      case Strings.GAMES:
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) => GamesScreen()
         ));
         break;
       default:

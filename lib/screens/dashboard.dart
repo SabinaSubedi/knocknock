@@ -18,7 +18,6 @@ class  DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProviderStateMixin {
   final StorageReference storageReference = FirebaseStorage().ref();
-  BuildContext _context;
   TabController _tabController;
 
   @override
@@ -77,7 +76,6 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    _context = context;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
