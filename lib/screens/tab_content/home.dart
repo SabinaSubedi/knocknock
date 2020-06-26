@@ -13,100 +13,81 @@ class HomeTabContent extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
 
     return Container(
-      child: Stack(
-        children: <Widget>[
-          ClipPath(
-            child: Container(
-              height: screenSize.height * 0.5,
-              color: Colors.blue.shade300,
-            ),
-            clipper: BackgroundClipper(),
+        child: Stack(
+      children: <Widget>[
+        ClipPath(
+          child: Container(
+            height: screenSize.height * 0.5,
+            color: Colors.blue.shade300,
           ),
+          clipper: BackgroundClipper(),
+        ),
 
-          // Application title
-          Container(
-            child: Text( 
-              'Knock@Knock',
-              style: TextStyle(
-                fontSize: 22.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.white
-              ),
-            ),
-            margin: EdgeInsets.symmetric(
-              horizontal: screenSize.width * 0.08
-            ),
-          ),
+        // Application title
+        Container(
+          width: 150.0,
+          child: Image.asset('assets/images/app_title_white.png'),
+          margin: EdgeInsets.symmetric(horizontal: screenSize.width * 0.08),
+        ),
 
-          // Home items
-          Container(
-            height: double.infinity,
-            margin: EdgeInsets.only(
+        // Home items
+        Container(
+          height: double.infinity,
+          margin: EdgeInsets.only(
               left: screenSize.width * 0.08,
               right: screenSize.width * 0.08,
-              top: screenSize.height * 0.08
-            ),
-            child: GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              crossAxisSpacing: 50.0,
-              mainAxisSpacing: 20.0,
-              children: _getHomeItems().map( ( HomeItem homeItem ) {
-                return Card(
-                  elevation: 10.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(25.0)
-                    )
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      IconButton(
-                        iconSize: 75.0,
-                        icon: Image.asset(
-                          homeItem.image
-                         ),
-                        onPressed: () => _handleHomeItemClick(context, homeItem),
-                      ),
-                      Text(homeItem.title),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          )    
-        ],
-      )
-    );
+              top: screenSize.height * 0.08),
+          child: GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            crossAxisSpacing: 50.0,
+            mainAxisSpacing: 20.0,
+            children: _getHomeItems().map((HomeItem homeItem) {
+              return Card(
+                elevation: 10.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0))),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    IconButton(
+                      iconSize: 75.0,
+                      icon: Image.asset(homeItem.image),
+                      onPressed: () => _handleHomeItemClick(context, homeItem),
+                    ),
+                    Text(homeItem.title),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        )
+      ],
+    ));
   }
 
   /// Handle the home item click.
   _handleHomeItemClick(BuildContext context, HomeItem homeItem) {
-    switch(homeItem.title) {
+    switch (homeItem.title) {
       case Strings.MUSIC:
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) => MusicListScreen()
-        ));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => MusicListScreen()));
         break;
 
       case Strings.FAQS:
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) => FAQListScreen()
-        ));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => FAQListScreen()));
         break;
 
       case Strings.GAMES:
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) => GamesScreen()
-        ));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => GamesScreen()));
         break;
 
       case Strings.VIDEOS:
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) => VideosScreen()
-        ));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => VideosScreen()));
         break;
       default:
         break;
@@ -116,11 +97,16 @@ class HomeTabContent extends StatelessWidget {
   /// Get list of home items.
   List<HomeItem> _getHomeItems() {
     List<HomeItem> homeItems = List<HomeItem>();
-    homeItems.add( HomeItem(image: 'assets/images/stethoscope.png', title: Strings.CONSULT_DOCTOR));
-    homeItems.add( HomeItem(image: 'assets/images/music.png', title: Strings.MUSIC));
-    homeItems.add( HomeItem(image: 'assets/images/video.png', title: Strings.VIDEOS));
-    homeItems.add( HomeItem(image: 'assets/images/games.png', title: Strings.GAMES));
-    homeItems.add( HomeItem(image: 'assets/images/faq.png', title: Strings.FAQS));
+    homeItems.add(HomeItem(
+        image: 'assets/images/stethoscope.png', title: Strings.CONSULT_DOCTOR));
+    homeItems
+        .add(HomeItem(image: 'assets/images/music.png', title: Strings.MUSIC));
+    homeItems
+        .add(HomeItem(image: 'assets/images/video.png', title: Strings.VIDEOS));
+    homeItems
+        .add(HomeItem(image: 'assets/images/games.png', title: Strings.GAMES));
+    homeItems
+        .add(HomeItem(image: 'assets/images/faq.png', title: Strings.FAQS));
     return homeItems;
   }
 }
@@ -130,7 +116,7 @@ class HomeItem {
   String image;
   String title;
 
-  HomeItem( {
+  HomeItem({
     @required this.image,
     @required this.title,
   });
@@ -142,8 +128,10 @@ class BackgroundClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     Path path = Path();
     path.lineTo(0, size.height);
-    path.quadraticBezierTo(size.width/4, size.height - 40, size.width/2, size.height-20);
-    path.quadraticBezierTo(3/4*size.width, size.height, size.width, size.height-30);
+    path.quadraticBezierTo(
+        size.width / 4, size.height - 40, size.width / 2, size.height - 20);
+    path.quadraticBezierTo(
+        3 / 4 * size.width, size.height, size.width, size.height - 30);
     path.lineTo(size.width, 0);
 
     return path;

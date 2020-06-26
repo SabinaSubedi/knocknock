@@ -11,43 +11,37 @@ import 'package:medicad/screens/dashboard.dart';
 import 'package:medicad/notifiers/app_title.dart';
 import 'package:medicad/services/auth.dart';
 
-void main() => runApp(
-  MultiProvider(
-    providers: [
-      ChangeNotifierProvider( create: (_) => AppTitleNotifier()),
-      ChangeNotifierProvider( create: (_) => MusicListNotifier()),
-      ChangeNotifierProvider( create: (_) => VideoListNotifier()),
-      ChangeNotifierProvider( create: (_) => ProfileInfoNotifier()),
-    ],
-    child: MyApp()
-  )
-);
+void main() => runApp(MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => AppTitleNotifier()),
+      ChangeNotifierProvider(create: (_) => MusicListNotifier()),
+      ChangeNotifierProvider(create: (_) => VideoListNotifier()),
+      ChangeNotifierProvider(create: (_) => ProfileInfoNotifier()),
+    ], child: MyApp()));
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      supportedLocales: [
+        title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
+        supportedLocales: [
           Locale('en'),
           Locale('it'),
           Locale('fr'),
           Locale('es'),
-      ],
-      localizationsDelegates: [
-        CountryLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      // home: AuthService().handleAuth(),
-      // home: DashboardScreen()
-      home: SplashScreen()
-    );
+        ],
+        localizationsDelegates: [
+          CountryLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        // home: AuthService().handleAuth(),
+        home: DashboardScreen()
+        // home: SplashScreen()
+        );
   }
 }
