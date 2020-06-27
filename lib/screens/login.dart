@@ -14,7 +14,8 @@ class _LoginScreenState extends State<LoginScreen> {
   String verificationId;
   CountryCode countryCode = CountryCode.fromCode('NP');
   final _formKey = GlobalKey<FormState>();
-  final phoneNumberTextController = TextEditingController();
+  final emailTextController = TextEditingController(text: 'caviryd@getnada.com');
+  final passwordTextController = TextEditingController(text: '12345678');
   bool _isLoggingIn = false;
 
   @override
@@ -31,86 +32,88 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Form(
             key: _formKey,
             child: Column(
-               crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    Strings.APP_TITLE,
-                    style: TextStyle(
-                      fontSize: 40.0,
-                      fontWeight: FontWeight.bold
-                    ),
-                  ),
-                  
-                  Text(
-                    Strings.ORG_NAME,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontStyle: FontStyle.italic
-                    ),
-                  ),
-
-                  SizedBox(
-                    height: 30.0,
-                  ),
-
-                  Row(
-                    children: <Widget>[                      
-                      CountryCodePicker(                    
-                        onChanged: (CountryCode countryCode) {
-                          this.countryCode = countryCode;
-                        },
-                        initialSelection: 'NP',
-                        favorite: ['+977','NP'],
-                        showCountryOnly: false,
-                        showOnlyCountryWhenClosed: false,
-                        alignLeft: false
-                      ),               
-                      
-                      Expanded(
-                        child: TextFormField(
-                          controller: phoneNumberTextController,
-                          keyboardType: TextInputType.phone,
-                          decoration: const InputDecoration(
-                            hintText: Strings.PHONE_NUMBER
-                          ),
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return Strings.ENTER_SOME_TEXT;
-                            }
-                            return null;
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-
-                  SizedBox(
-                    height: 10.0,
-                  ),
-
-                  RaisedButton(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset('assets/images/app_title_color.png'),
+                TextFormField(
+                  controller: emailTextController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration:
+                      const InputDecoration(hintText: Strings.EMAIL),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return Strings.ENTER_SOME_TEXT;
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: passwordTextController,
+                  keyboardType: TextInputType.phone,
+                  obscureText: true,
+                  decoration:
+                      const InputDecoration(hintText: Strings.PASSWORD),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return Strings.ENTER_SOME_TEXT;
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Builder(
+                  builder:(context) => RaisedButton(
                     onPressed: () async {
-                      final String phoneNumber = phoneNumberTextController.text;
-                      verifyPhone(countryCode.dialCode + phoneNumber);
+                      setState(() => _isLoggingIn = true );
+                      final String email = emailTextController.text;
+                      final String password = passwordTextController.text;
+
+                      AuthService authService = new AuthService();
+                      authService.signIn(email, password).then((value) {
+                        final snackbar = SnackBar(
+                          content: Text(Strings.LOGGED_IN_SUCCESSFULLY)
+                        );
+                        Scaffold.of(context).showSnackBar(snackbar);
+                      }).catchError((error) {
+                        final snackbar = SnackBar(
+                          content: Text(error.message)
+                        );
+                        Scaffold.of(context).showSnackBar(snackbar);
+                      });
+                      
+                      setState(() => _isLoggingIn = false );
                     },
                     child: _getSubmitButtonChild(),
                     color: Colors.blue,
                   ),
-                  SizedBox(
-                    height: 50.0,
-                  ),
-                ]
-            )
-          )
+                ),
+                SizedBox(
+                  height: 20.0,
+                ),
+                FlatButton(
+                  onPressed: () async {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => SignUpScreen()
+                    ));
+                  },
+                  child: Text(Strings.CREATE_AN_ACCOUNT),
+                  color: Colors.orange.shade500,
+                  textColor: Colors.white,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
   Widget _getSubmitButtonChild() {
-    if ( _isLoggingIn ) {
-      return  Padding(
+    if (_isLoggingIn) {
+      return Padding(
         padding: EdgeInsets.all(10.0),
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
@@ -119,41 +122,8 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       return Text(
         Strings.SIGN_IN,
-        style: TextStyle(
-          color: Colors.white
-        ),
+        style: TextStyle(color: Colors.white),
       );
     }
-  }
-  Future<void> verifyPhone(String phoneNumber) async {
-    setState(() => _isLoggingIn = true );
-
-    final PhoneVerificationCompleted phoneVerificationCompleted = (AuthCredential authCredential) {
-      AuthService().signIn(authCredential);
-      setState(() => _isLoggingIn = false );
-    };
-
-    final PhoneVerificationFailed phoneVerificationFailed = (AuthException authException) {
-      print('${authException.message}');
-      setState(() => _isLoggingIn = false );
-    };
-
-    final PhoneCodeSent phoneCodeSent = (String verId, [int forceResend]) {
-      this.verificationId = verId;
-    };
-
-    final PhoneCodeAutoRetrievalTimeout autoRetrievalTimeout = (String verId) {
-      this.verificationId = verId;
-      setState(() => _isLoggingIn = false );
-    };
-
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      timeout: const Duration( seconds: 60),
-      verificationCompleted: phoneVerificationCompleted,
-      verificationFailed: phoneVerificationFailed,
-      codeSent: phoneCodeSent,
-      codeAutoRetrievalTimeout: autoRetrievalTimeout
-    );
   }
 }

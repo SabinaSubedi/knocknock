@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medicad/screens/consult_doctor.dart';
 import 'package:medicad/screens/faq_list.dart';
 import 'package:medicad/screens/games.dart';
 import 'package:medicad/screens/music_list.dart';
@@ -71,23 +72,38 @@ class HomeTabContent extends StatelessWidget {
   _handleHomeItemClick(BuildContext context, HomeItem homeItem) {
     switch (homeItem.title) {
       case Strings.MUSIC:
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => MusicListScreen()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MusicListScreen())
+        );
         break;
 
       case Strings.FAQS:
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => FAQListScreen()));
+          context,
+          MaterialPageRoute(builder: (context) => FAQListScreen())
+        );
         break;
 
       case Strings.GAMES:
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => GamesScreen()));
+          context,
+          MaterialPageRoute(builder: (context) => GamesScreen())
+        );
         break;
 
       case Strings.VIDEOS:
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => VideosScreen()));
+          context, 
+          MaterialPageRoute(builder: (context) => VideosScreen())
+        );
+        break;
+
+      case Strings.CONSULT_DOCTOR:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ConsultDoctorScreen())
+        );
         break;
       default:
         break;

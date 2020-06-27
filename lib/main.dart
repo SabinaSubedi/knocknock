@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:medicad/notifiers/gender.dart';
 import 'package:medicad/notifiers/music_list.dart';
 import 'package:medicad/notifiers/profile_info.dart';
+import 'package:medicad/notifiers/user_type.dart';
 import 'package:medicad/notifiers/videos_list.dart';
 import 'package:medicad/screens/splash.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +18,8 @@ void main() => runApp(MultiProvider(providers: [
       ChangeNotifierProvider(create: (_) => MusicListNotifier()),
       ChangeNotifierProvider(create: (_) => VideoListNotifier()),
       ChangeNotifierProvider(create: (_) => ProfileInfoNotifier()),
+      ChangeNotifierProvider(create: (_) => GenderNotifier()),
+      ChangeNotifierProvider(create: (_) => UserTypeNotifier()),
     ], child: MyApp()));
 
 class MyApp extends StatelessWidget {
@@ -23,25 +27,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
-        supportedLocales: [
-          Locale('en'),
-          Locale('it'),
-          Locale('fr'),
-          Locale('es'),
-        ],
-        localizationsDelegates: [
-          CountryLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        // home: AuthService().handleAuth(),
-        home: DashboardScreen()
-        // home: SplashScreen()
-        );
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      supportedLocales: [
+        Locale('en'),
+        Locale('it'),
+        Locale('fr'),
+        Locale('es'),
+      ],
+      localizationsDelegates: [
+        CountryLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: AuthService().handleAuth(),
+      // home: DashboardScreen()
+      // home: SplashScreen()
+    );
   }
 }

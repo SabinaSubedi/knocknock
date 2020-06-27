@@ -50,20 +50,43 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
   }
 
   void _getProfileImage() async {
+    String profileImage;
+    var info;
     FirebaseUser _firebaseUser = await FirebaseAuth.instance.currentUser();
-    String profileImage = await storageReference.child('profile').child(_firebaseUser.uid).getDownloadURL();
-    var info = await Firestore.instance.collection('users').document(_firebaseUser.uid).get();
 
-    User user = User(
-      profileImage: profileImage,
-      firstName: info.data['firstName'] ?? '',
-      lastName: info.data['lastName'] ?? '',
-      gender: info.data['gender'] ?? '',
-      email: info.data['email'] ?? '',
-      address: info.data['address'] ?? '',
-      userType: info.data['userType'] ?? '',
-      doctorSpeciality: info.data['doctorSpeciality'] ?? '',
-    );
+    try {
+      profileImage = await storageReference.child('profile').child(_firebaseUser.uid).getDownloadURL();
+    } catch( error ) {} 
+    try {
+      info = await Firestore.instance.collection('users').document(_firebaseUser.uid).get();
+    } catch( error ) {}
+
+    User user;
+    try {
+       user = User(
+        profileImage: profileImage ?? '',
+        firstName: info?.data['firstName'],
+        lastName: info?.data['lastName'],
+        gender: info?.data['gender'],
+        email: _firebaseUser?.email,
+        phone: info?.data['phone'],
+        address: info?.data['address'],
+        userType: info?.data['userType'],
+        doctorSpeciality: info?.data['doctorSpeciality'],
+      );
+    } catch( error ) {
+       user = User(
+        profileImage: '',
+        firstName: '',
+        lastName: '',
+        gender: 'male',
+        email: '',
+        phone: '',
+        address: '',
+        userType: 'patient',
+        doctorSpeciality: ''
+      );
+    }
 
     Provider.of<ProfileInfoNotifier>(context, listen: false).setUser(user);
   }

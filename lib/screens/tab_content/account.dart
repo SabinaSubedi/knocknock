@@ -7,7 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image/image.dart' as SImage;
 import 'package:medicad/model/user.dart';
+import 'package:medicad/notifiers/gender.dart';
 import 'package:medicad/notifiers/profile_info.dart';
+import 'package:medicad/notifiers/user_type.dart';
 import 'package:medicad/strings.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -23,10 +25,9 @@ class _AccountTabContentState extends State<AccountTabContent> {
   final _firstNameTextController = TextEditingController(text: '');
   final _lastNameTextController = TextEditingController(text: '');
   final _emailTextController = TextEditingController(text: '');
+  final _phoneTextController = TextEditingController(text: '');
   final _addressTextController = TextEditingController(text: '');
   final _doctorSpecialityController = TextEditingController(text: '');
-  String _gender = 'male';
-  String _userType = 'patient';
 
   @override
   Widget build(BuildContext context) {    
@@ -40,17 +41,18 @@ class _AccountTabContentState extends State<AccountTabContent> {
           child: Selector<ProfileInfoNotifier, User>(
             selector: (context, data) => data.user,
             builder: (context, user, child ) {
-              if ( null == user ) {
+              if( null == user ) {
                 return CircularProgressIndicator();
               }
-              
-              _firstNameTextController.text = user.firstName ?? '';
-              _lastNameTextController.text = user.lastName ?? '';
-              _emailTextController.text = user.email ?? '';
-              _addressTextController.text = user.address ?? '';
-              _doctorSpecialityController.text = user.doctorSpeciality ?? '';
-              _gender = user.gender ?? 'male';
-              _userType = user.userType ?? 'patient';
+
+              _firstNameTextController.text = user?.firstName;
+              _lastNameTextController.text = user?.lastName;
+              _emailTextController.text = user?.email;
+              _phoneTextController.text = user?.phone;
+              _addressTextController.text = user?.address;
+              _doctorSpecialityController.text = user?.doctorSpeciality;
+              Provider.of<GenderNotifier>(context, listen: false).setGender(user?.gender);
+              Provider.of<UserTypeNotifier>(context, listen: false).setUserType(user?.userType);
 
               return SingleChildScrollView(
                 child: Column(
@@ -60,10 +62,10 @@ class _AccountTabContentState extends State<AccountTabContent> {
                   children: <Widget>[
                     InkWell(
                       child: Selector<ProfileInfoNotifier, String>(
-                        selector: (context, data) => data.user.profileImage,
+                        selector: (context, data) => data?.user?.profileImage,
                         builder: (context, profileImage, child ) {
                         return CircleAvatar(
-                          backgroundImage: null == profileImage ? AssetImage('assets/images/user-silhouette.png') : NetworkImage(profileImage),          
+                          backgroundImage: profileImage.isEmpty ? AssetImage('assets/images/user-silhouette.png') : NetworkImage(profileImage),          
                           radius: 50.0,
                           backgroundColor: Colors.transparent,
                         );
@@ -119,16 +121,36 @@ class _AccountTabContentState extends State<AccountTabContent> {
                     ),
 
                     // Genders
-                    Row(
-                      children: _getGenders(),
+                    Consumer<GenderNotifier>(
+                      builder: (context, genderNotifier, child) {
+                        return Row(
+                          children: _getGenders(genderNotifier.gender),
+                        );
+                      },
                     ),
 
                     // Email
                     TextFormField(
                       keyboardType: TextInputType.emailAddress,
                       controller: _emailTextController,
+                      enabled: false,
                       decoration: const InputDecoration(
                         hintText: Strings.EMAIL
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return Strings.ENTER_SOME_TEXT;
+                        }
+                        return null;
+                      },
+                    ),
+
+                    // Phone Number
+                    TextFormField(
+                      keyboardType: TextInputType.phone,
+                      controller: _phoneTextController,
+                      decoration: const InputDecoration(
+                        hintText: Strings.PHONE_NUMBER
                       ),
                       validator: (value) {
                         if (value.isEmpty) {
@@ -154,23 +176,35 @@ class _AccountTabContentState extends State<AccountTabContent> {
                     ),
 
                     // User types
-                    Row(
-                      children: _getUserTypes(),
+                    Consumer<UserTypeNotifier>(
+                      builder: (context, userTypeNotifier, child) {
+                        return Row(
+                          children: _getUserTypes(userTypeNotifier.userType),
+                        );
+                      }
                     ),
 
                     // Doctor speciality.
-                    TextFormField(
-                      keyboardType: TextInputType.text,
-                      controller: _doctorSpecialityController,
-                      decoration: const InputDecoration(
-                        hintText: 'Doctor Speciality'
-                      ),
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return Strings.ENTER_SOME_TEXT;
+                    Consumer<UserTypeNotifier>(
+                      builder: (context, userTypeNotifier, child) {
+                        if( 'doctor' == userTypeNotifier.userType) {
+                          return TextFormField(
+                            keyboardType: TextInputType.text,
+                            controller: _doctorSpecialityController,
+                            decoration: const InputDecoration(
+                              hintText: 'Doctor Speciality'
+                            ),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return Strings.ENTER_SOME_TEXT;
+                              }
+                              return null;
+                            },
+                          );
+                        } else {
+                          return Container();
                         }
-                        return null;
-                      },
+                      }
                     ),
 
                     SizedBox(
@@ -212,41 +246,41 @@ class _AccountTabContentState extends State<AccountTabContent> {
     );
   }
 
-  List<Widget> _getUserTypes() {
+  List<Widget> _getUserTypes(String userType) {
     List<Widget> userTypes = List();
 
     userTypes.add(Text('User Type: '));
 
-    userTypes.add(Radio(value: 'patient', groupValue: _userType, onChanged: _handleUserTypeChange,));
+    userTypes.add(Radio(value: 'patient', groupValue: userType, onChanged: _handleUserTypeChange,));
     userTypes.add(Text('Patient'));
 
-    userTypes.add(Radio(value: 'Doctor', groupValue: _userType, onChanged: _handleUserTypeChange));
+    userTypes.add(Radio(value: 'doctor', groupValue: userType, onChanged: _handleUserTypeChange));
     userTypes.add(Text('Doctor'));
 
     return userTypes;
   }
 
   void _handleUserTypeChange(userType) {
-    setState(() => _userType = userType );
+    Provider.of<UserTypeNotifier>(context, listen: false).setUserType(userType);
   }
 
-  List<Widget> _getGenders() {
+  List<Widget> _getGenders(gender) {
     List<Widget> genders = List();
 
-    genders.add(Radio(value: 'male', groupValue: _gender, onChanged: _handleGenderChange,));
+    genders.add(Radio(value: 'male', groupValue: gender, onChanged: _handleGenderChange,));
     genders.add(Text('Male'));
 
-    genders.add(Radio(value: 'female', groupValue: _gender, onChanged: _handleGenderChange));
+    genders.add(Radio(value: 'female', groupValue: gender, onChanged: _handleGenderChange));
     genders.add(Text('Female'));
 
-    genders.add(Radio(value: 'other', groupValue: _gender, onChanged: _handleGenderChange));
+    genders.add(Radio(value: 'other', groupValue: gender, onChanged: _handleGenderChange));
     genders.add(Text('Other'));
 
     return genders;
   }
 
   void _handleGenderChange(gender) {
-    setState(() => _gender = gender );
+    Provider.of<GenderNotifier>(context, listen: false).setGender(gender);
   }
 
   void _getFile() async {
@@ -274,13 +308,14 @@ class _AccountTabContentState extends State<AccountTabContent> {
     User user = Provider.of<ProfileInfoNotifier>(context, listen: false).user;
     User newUser = User(
       profileImage: profileImage,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      gender: user.gender,
-      email: user.email,
-      address: user.address,
-      userType: user.userType,
-      doctorSpeciality: user.doctorSpeciality
+      firstName: user?.firstName ?? '',
+      lastName: user?.lastName ??'' ,
+      gender: user?.gender ?? 'male',
+      email: user?.email ?? '',
+      phone: user?.phone ?? '',
+      address: user?.address ?? '',
+      userType: user?.userType ?? 'patient',
+      doctorSpeciality: user?.doctorSpeciality ?? ''
     );
 
     Provider.of<ProfileInfoNotifier>(context, listen: false).setIsUploading(false);
@@ -301,15 +336,19 @@ class _AccountTabContentState extends State<AccountTabContent> {
     final String firstName = _firstNameTextController.text;
     final String lastName = _lastNameTextController.text;
     final String email = _emailTextController.text;
+    final String phone = _phoneTextController.text;
     final String address = _addressTextController.text;
     final String doctorSpeciality = _doctorSpecialityController.text;
+    final String gender = Provider.of<GenderNotifier>(context, listen: false).gender;
+    final String userType = Provider.of<UserTypeNotifier>(context, listen: false).userType;
     
     Firestore.instance.collection('users').document(uid).setData({
       'firstName': firstName,
       'lastName': lastName,
-      'gender' : _gender,
+      'gender' : gender,
       'email' : email,
-      'userType': _userType,
+      'phone' : phone,
+      'userType': userType,
       'address': address,
       'doctorSpeciality': doctorSpeciality
     }).whenComplete((){      
