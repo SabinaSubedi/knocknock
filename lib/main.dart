@@ -5,6 +5,7 @@ import 'package:medicad/notifiers/gender.dart';
 import 'package:medicad/notifiers/music_list.dart';
 import 'package:medicad/notifiers/profile_info.dart';
 import 'package:medicad/notifiers/user.dart';
+import 'package:medicad/notifiers/user_login_status.dart';
 import 'package:medicad/notifiers/user_type.dart';
 import 'package:medicad/notifiers/videos_list.dart';
 import 'package:medicad/screens/splash.dart';
@@ -24,6 +25,7 @@ void main() => runApp(MultiProvider(providers: [
       ChangeNotifierProvider(create: (_) => UserTypeNotifier()),
       ChangeNotifierProvider(create: (_) => DoctorListNotifier()),
       ChangeNotifierProvider(create: (_) => UserNotifier()),
+      ChangeNotifierProvider(create: (_) => UserLoginStatusNotifier()),
     ], child: MyApp()));
 
 class MyApp extends StatelessWidget {

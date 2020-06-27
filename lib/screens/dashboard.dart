@@ -88,8 +88,9 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
         doctorSpeciality: ''
       );
     }
-
-    Provider.of<ProfileInfoNotifier>(context, listen: false).setUser(user);
+    if( nul != context) {
+      Provider.of<ProfileInfoNotifier>(context, listen: false).setUser(user);
+    }
   }
 
   @override
