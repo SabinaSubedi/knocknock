@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
+import 'package:medicad/notifiers/user.dart';
 import 'package:medicad/screens/dashboard.dart';
 import 'package:medicad/screens/login.dart';
+import 'package:provider/provider.dart';
 
 abstract class BaseAuth {
   Future<String> signIn(String email, String password);
@@ -25,6 +27,7 @@ class AuthService implements BaseAuth {
       stream: FirebaseAuth.instance.onAuthStateChanged,
       builder: (BuildContext context, snapshot) {
         if (snapshot.hasData) {
+          Provider.of<UserNotifier>(context, listen: false).setUser(snapshot.data);
           return DashboardScreen();
         } else {
           return LoginScreen();

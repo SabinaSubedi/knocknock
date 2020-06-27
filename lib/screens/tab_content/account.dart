@@ -342,6 +342,19 @@ class _AccountTabContentState extends State<AccountTabContent> {
     final String gender = Provider.of<GenderNotifier>(context, listen: false).gender;
     final String userType = Provider.of<UserTypeNotifier>(context, listen: false).userType;
     
+    User userProfile = Provider.of<ProfileInfoNotifier>(context, listen: false).user;
+    User user = User(
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      phone: phone,
+      address: address,
+      doctorSpeciality: doctorSpeciality,
+      gender: gender,
+      userType: userType,
+      profileImage: userProfile?.profileImage
+    );
+
     Firestore.instance.collection('users').document(uid).setData({
       'firstName': firstName,
       'lastName': lastName,
@@ -353,6 +366,7 @@ class _AccountTabContentState extends State<AccountTabContent> {
       'doctorSpeciality': doctorSpeciality
     }).whenComplete((){      
       Provider.of<ProfileInfoNotifier>(context, listen: false).setIsSaving(false);
+      Provider.of<ProfileInfoNotifier>(context, listen: false).setUser(user);
     }).then((value) {
       SnackBar snackBar = SnackBar(
         content: Text('Update successfully'),

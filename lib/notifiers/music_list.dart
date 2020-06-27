@@ -14,6 +14,7 @@ class MusicListNotifier with ChangeNotifier {
   AudioPlayerState get audioPlayerState => _audioPlayerState;
 
   void setMusicList(List<FirebaseFile> musicList) {
+    _musiclist.clear();
     _musiclist.addAll(musicList);
     notifyListeners();
   }

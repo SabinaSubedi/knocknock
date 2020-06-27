@@ -1,4 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:medicad/model/user.dart';
+import 'package:medicad/notifiers/doctor_list.dart';
+import 'package:medicad/notifiers/profile_info.dart';
+import 'package:medicad/notifiers/user.dart';
 import 'package:medicad/screens/consult_doctor.dart';
 import 'package:medicad/screens/faq_list.dart';
 import 'package:medicad/screens/games.dart';
@@ -8,7 +15,12 @@ import 'package:provider/provider.dart';
 import 'package:medicad/notifiers/app_title.dart';
 import 'package:medicad/strings.dart';
 
-class HomeTabContent extends StatelessWidget {
+class HomeTabContent extends StatefulWidget {
+  @override
+  _HomeTabContentState createState() => _HomeTabContentState();
+}
+
+class _HomeTabContentState extends State<HomeTabContent> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -100,6 +112,7 @@ class HomeTabContent extends StatelessWidget {
         break;
 
       case Strings.CONSULT_DOCTOR:
+         _getDoctors(context);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ConsultDoctorScreen())
@@ -110,11 +123,51 @@ class HomeTabContent extends StatelessWidget {
     }
   }
 
+  void _getDoctors(BuildContext context) async {
+    var documents = await Firestore.instance.collection('users').where('userType', isEqualTo: 'doctor').getDocuments();
+    List<User> doctors = List();
+    if ( null != documents.documents) {
+      int length = documents.documents.length;
+      for(int index = 0; index < length; ++index) {
+        var document = documents.documents[index];
+
+        String uid = document.documentID;
+        String image;
+        try {
+        image = await FirebaseStorage().ref().child('profile').child(uid).getDownloadURL();
+        } catch( error) {
+
+        }        
+
+        User user = User(
+          uid: uid,
+          profileImage: image ?? '',
+          firstName: document.data['firstName'],
+          lastName: document.data['lastName'],
+          email: document.data['email'],
+          address: document.data['address'],
+          doctorSpeciality: document.data['doctorSpeciality'],
+          gender: document.data['gender'],
+          phone: document.data['phone'],
+          userType: document.data['userType']
+        );
+
+        doctors.add(user);
+      }
+    }
+
+    Provider.of<DoctorListNotifier>(context, listen: false).setDoctorList(doctors);
+  }
+
   /// Get list of home items.
   List<HomeItem> _getHomeItems() {
+    User user = Provider.of<ProfileInfoNotifier>(context, listen: false).user;
+  
     List<HomeItem> homeItems = List<HomeItem>();
-    homeItems.add(HomeItem(
-        image: 'assets/images/stethoscope.png', title: Strings.CONSULT_DOCTOR));
+    if( user == null || user.userType == 'patient' ) {
+      homeItems.add(HomeItem(
+          image: 'assets/images/stethoscope.png', title: Strings.CONSULT_DOCTOR));
+    }
     homeItems
         .add(HomeItem(image: 'assets/images/music.png', title: Strings.MUSIC));
     homeItems

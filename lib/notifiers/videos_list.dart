@@ -8,6 +8,7 @@ class VideoListNotifier with ChangeNotifier {
   List<FirebaseFile> get videoList => List.unmodifiable(_videolist );
 
   void setVideoList(List<FirebaseFile> videoList) {
+    _videolist.clear();
     _videolist.addAll(videoList);
     notifyListeners();
   }

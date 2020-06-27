@@ -25,6 +25,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
     super.initState();
     _tabController = TabController( vsync: this, length: 3);
     _tabController.addListener(_handleTabSelection);
+    _getProfileImage();
   }
 
  void _handleTabSelection() {
@@ -110,13 +111,7 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
             }
           ),
           backgroundColor: Colors.blue.shade300,
-          elevation: 0.0,
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.notifications),
-              onPressed: () {},
-            ),
-          ],
+          elevation: 0.0
         ),
         body: SafeArea(
           child: TabBarView(
