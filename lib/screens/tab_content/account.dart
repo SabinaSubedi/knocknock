@@ -77,6 +77,13 @@ class _AccountTabContentState extends State<AccountTabContent> {
                       height: 10.0,
                     ),
 
+                    RaisedButton(
+                      child: Text('Logout'),
+                      onPressed: () => FirebaseAuth.instance.signOut(),
+                      color: Colors.orange.shade400,
+                      textColor: Colors.white,
+                    ),
+
                     Selector<ProfileInfoNotifier, bool>(
                     selector: (context, data) => data.isUploading,
                     builder: (context, isUploading, child) {
