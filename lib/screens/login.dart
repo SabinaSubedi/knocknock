@@ -4,6 +4,7 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:medicad/model/user.dart';
 import 'package:medicad/notifiers/user.dart';
 import 'package:medicad/notifiers/user_login_status.dart';
+import 'package:medicad/screens/dashboard.dart';
 import 'package:medicad/screens/signup.dart';
 import 'package:medicad/services/auth.dart';
 import 'package:medicad/strings.dart';
@@ -71,14 +72,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   builder:(context) => RaisedButton(
                     onPressed: () async {
                       Provider.of<UserLoginStatusNotifier>(context, listen: false).setIsLogginIn(true);
-                      final String email = emailTextController.text;
-                      final String password = passwordTextController.text;
+                      final String email = emailTextController.text.trim();
+                      final String password = passwordTextController.text.trim();
                       try {
                         String message = Strings.LOGGED_IN_SUCCESSFULLY;
                         AuthService authService = new AuthService();
                         String response = await authService.signIn(email, password);
                         FirebaseUser user = await FirebaseAuth.instance.currentUser();
-                        if (!  user.isEmailVerified) {
+                        if (!user.isEmailVerified) {
                           message = 'Please, verify your email !';
                         }
 
@@ -86,6 +87,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           content: Text(message)
                         );
                         Scaffold.of(context).showSnackBar(snackbar);
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => DashboardScreen(),
+                        ));
                       } catch(error) {
                         try {
                           final snackbar = SnackBar(

@@ -84,8 +84,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onPressed: () async {
                         setState(() => _isSigningUp = true );
 
-                        final String email = emailTextController.text;
-                        final String password = passwordTextController.text;
+                        final String email = emailTextController.text.trim();
+                        final String password = passwordTextController.text.trim();
 
                         AuthService authService = new AuthService();
                         try {
