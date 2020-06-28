@@ -27,8 +27,13 @@ class AuthService implements BaseAuth {
       stream: FirebaseAuth.instance.onAuthStateChanged,
       builder: (BuildContext context, snapshot) {
         if (snapshot.hasData) {
+          FirebaseUser user = snapshot.data;
           Provider.of<UserNotifier>(context, listen: false).setUser(snapshot.data);
-          return DashboardScreen();
+          if ( user.isEmailVerified) {
+            return DashboardScreen();
+          } else {
+            return LoginScreen();
+          }
         } else {
           return LoginScreen();
         }

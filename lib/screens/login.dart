@@ -18,8 +18,8 @@ class _LoginScreenState extends State<LoginScreen> {
   String verificationId;
   CountryCode countryCode = CountryCode.fromCode('NP');
   final _formKey = GlobalKey<FormState>();
-  final emailTextController = TextEditingController(text: 'caviryd@getnada.com');
-  final passwordTextController = TextEditingController(text: '12345678');
+  final emailTextController = TextEditingController(text: '');
+  final passwordTextController = TextEditingController(text: '');
 
   @override
   Widget build(BuildContext context) {
@@ -74,10 +74,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       final String email = emailTextController.text;
                       final String password = passwordTextController.text;
                       try {
+                        String message = Strings.LOGGED_IN_SUCCESSFULLY;
                         AuthService authService = new AuthService();
-                        await authService.signIn(email, password);
+                        String response = await authService.signIn(email, password);
+                        FirebaseUser user = await FirebaseAuth.instance.currentUser();
+                        if (!  user.isEmailVerified) {
+                          message = 'Please, verify your email !';
+                        }
+
                         final snackbar = SnackBar(
-                          content: Text(Strings.LOGGED_IN_SUCCESSFULLY)
+                          content: Text(message)
                         );
                         Scaffold.of(context).showSnackBar(snackbar);
                       } catch(error) {

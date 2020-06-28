@@ -14,8 +14,8 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey                  = GlobalKey<FormState>();
   final FirebaseAuth _auth        = FirebaseAuth.instance;
-  final emailTextController = TextEditingController(text: 'caviryd@getnada.com');
-  final passwordTextController    = TextEditingController(text: '12345678');
+  final emailTextController = TextEditingController(text: '');
+  final passwordTextController    = TextEditingController(text: '');
   bool _isObsecure = true;
   bool _isSigningUp = false;
 
@@ -88,7 +88,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         final String password = passwordTextController.text;
 
                         AuthService authService = new AuthService();
-                       authService.signUp(email, password).then((value) {
+                        try {
+                          await authService.signUp(email, password);
+                          FirebaseUser user = await  FirebaseAuth.instance.currentUser();
+                          user.sendEmailVerification();
+
                           final snackbar = SnackBar(
                             content: Text(Strings.REGISTER_SUCCESSFULLY)
                           );
@@ -97,12 +101,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Timer(const Duration(seconds: 2), () {
                             Navigator.pop(context);
                           });        
-                        }).catchError((error) {
+                        } catch(error) {
                           final snackbar = SnackBar(
                             content: Text(error.message)
                           );
                           Scaffold.of(context).showSnackBar(snackbar);           
-                        });
+                        }
 
                         setState(() => _isSigningUp = false );
                       },

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -64,12 +65,13 @@ class _AccountTabContentState extends State<AccountTabContent> {
                       child: Selector<ProfileInfoNotifier, String>(
                         selector: (context, data) => data?.user?.profileImage,
                         builder: (context, profileImage, child ) {
-                        return CircleAvatar(
-                          backgroundImage: profileImage.isEmpty ? AssetImage('assets/images/user-silhouette.png') : NetworkImage(profileImage),          
-                          radius: 50.0,
-                          backgroundColor: Colors.transparent,
-                        );
-                      }),
+                          return CircleAvatar(
+                            backgroundImage: profileImage.isEmpty ? AssetImage('assets/images/user-silhouette.png') : NetworkImage(profileImage),          
+                            radius: 50.0,
+                            backgroundColor: Colors.transparent,
+                          );
+                        }
+                      ),
                       onTap: _getFile,
                     ),
 
