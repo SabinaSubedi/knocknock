@@ -81,7 +81,9 @@ class _AccountTabContentState extends State<AccountTabContent> {
 
                     RaisedButton(
                       child: Text('Logout'),
-                      onPressed: () => FirebaseAuth.instance.signOut(),
+                      onPressed: () async {
+                        await FirebaseAuth.instance.signOut();
+                      },
                       color: Colors.orange.shade400,
                       textColor: Colors.white,
                     ),

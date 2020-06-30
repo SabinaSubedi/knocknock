@@ -23,6 +23,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final passwordTextController = TextEditingController(text: '');
 
   @override
+  void initState() {
+    super.initState();
+    Provider.of<UserLoginStatusNotifier>(context, listen: false).setIsLogginIn(false);
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -81,24 +86,23 @@ class _LoginScreenState extends State<LoginScreen> {
                         FirebaseUser user = await FirebaseAuth.instance.currentUser();
                         if (!user.isEmailVerified) {
                           message = 'Please, verify your email !';
+                          await FirebaseAuth.instance.signOut();
                         }
 
                         final snackbar = SnackBar(
                           content: Text(message)
                         );
                         Scaffold.of(context).showSnackBar(snackbar);
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => DashboardScreen(),
-                        ));
+                        Provider.of<UserLoginStatusNotifier>(context, listen: false).setIsLogginIn(false);
                       } catch(error) {
                         try {
                           final snackbar = SnackBar(
                             content: Text(error.message)
                           );
                           Scaffold.of(context).showSnackBar(snackbar);
+                          Provider.of<UserLoginStatusNotifier>(context, listen: false).setIsLogginIn(false);
                         } catch(error){}
                       }                   
-                      Provider.of<UserLoginStatusNotifier>(context, listen: false).setIsLogginIn(false);
                     },
                     child: Consumer<UserLoginStatusNotifier>(
                       builder: (context, user, child) {
