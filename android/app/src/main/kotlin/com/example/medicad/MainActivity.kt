@@ -1,4 +1,4 @@
-package com.example.medicad
+package com.example.knocknock
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
