@@ -92,6 +92,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           await authService.signUp(email, password);
                           FirebaseUser user = await  FirebaseAuth.instance.currentUser();
                           user.sendEmailVerification();
+                          await FirebaseAuth.instance.signOut();
 
                           final snackbar = SnackBar(
                             content: Text(Strings.REGISTER_SUCCESSFULLY)
