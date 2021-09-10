@@ -1,14 +1,14 @@
 import 'package:flutter/widgets.dart';
-import 'package:medicad/model/user.dart';
+import 'package:medicad/model/knock_user.dart';
 
 class ProfileInfoNotifier with ChangeNotifier {
   bool _isSaving = false;
   bool _isUploading = false;
-  User _user;
+  KnockUser _user;
 
   bool get isSaving => _isSaving;
 
-  void setIsSaving(bool isSaving ) {
+  void setIsSaving(bool isSaving) {
     this._isSaving = isSaving;
     notifyListeners();
   }
@@ -20,9 +20,9 @@ class ProfileInfoNotifier with ChangeNotifier {
     notifyListeners();
   }
 
-  User get user => _user;
+  KnockUser get user => _user;
 
-  void setUser(User user) {
+  void setUser(KnockUser user) {
     this._user = user;
     notifyListeners();
   }

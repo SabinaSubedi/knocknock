@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-class User {
+class KnockUser {
   final String uid;
   final String profileImage;
   final String firstName;
@@ -13,7 +13,7 @@ class User {
   final String userType;
   final String doctorSpeciality;
 
-  User({
+  KnockUser({
     this.uid,
     @required this.profileImage,
     @required this.firstName,

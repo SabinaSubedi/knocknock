@@ -1,18 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:medicad/model/user.dart';
+import 'package:medicad/model/knock_user.dart';
 import 'package:medicad/notifiers/doctor_list.dart';
 import 'package:medicad/notifiers/profile_info.dart';
-import 'package:medicad/notifiers/user.dart';
 import 'package:medicad/screens/consult_doctor.dart';
 import 'package:medicad/screens/faq_list.dart';
 import 'package:medicad/screens/games.dart';
 import 'package:medicad/screens/music_list.dart';
 import 'package:medicad/screens/videos.dart';
 import 'package:provider/provider.dart';
-import 'package:medicad/notifiers/app_title.dart';
 import 'package:medicad/strings.dart';
 
 class HomeTabContent extends StatefulWidget {
@@ -84,39 +81,29 @@ class _HomeTabContentState extends State<HomeTabContent> {
   _handleHomeItemClick(BuildContext context, HomeItem homeItem) {
     switch (homeItem.title) {
       case Strings.MUSIC:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MusicListScreen())
-        );
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => MusicListScreen()));
         break;
 
       case Strings.FAQS:
         Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => FAQListScreen())
-        );
+            context, MaterialPageRoute(builder: (context) => FAQListScreen()));
         break;
 
       case Strings.GAMES:
         Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => GamesScreen())
-        );
+            context, MaterialPageRoute(builder: (context) => GamesScreen()));
         break;
 
       case Strings.VIDEOS:
         Navigator.push(
-          context, 
-          MaterialPageRoute(builder: (context) => VideosScreen())
-        );
+            context, MaterialPageRoute(builder: (context) => VideosScreen()));
         break;
 
       case Strings.CONSULT_DOCTOR:
-         _getDoctors(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ConsultDoctorScreen())
-        );
+        _getDoctors(context);
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => ConsultDoctorScreen()));
         break;
       default:
         break;
@@ -124,49 +111,56 @@ class _HomeTabContentState extends State<HomeTabContent> {
   }
 
   void _getDoctors(BuildContext context) async {
-    var documents = await Firestore.instance.collection('users').where('userType', isEqualTo: 'doctor').getDocuments();
-    List<User> doctors = List();
-    if ( null != documents.documents) {
+    var documents = await Firestore.instance
+        .collection('users')
+        .where('userType', isEqualTo: 'doctor')
+        .getDocuments();
+    List<KnockUser> doctors = [];
+    if (null != documents.documents) {
       int length = documents.documents.length;
-      for(int index = 0; index < length; ++index) {
+      for (int index = 0; index < length; ++index) {
         var document = documents.documents[index];
 
         String uid = document.documentID;
         String image;
         try {
-        image = await FirebaseStorage().ref().child('profile').child(uid).getDownloadURL();
-        } catch( error) {
+          image = await FirebaseStorage()
+              .ref()
+              .child('profile')
+              .child(uid)
+              .getDownloadURL();
+        } catch (error) {}
 
-        }        
-
-        User user = User(
-          uid: uid,
-          profileImage: image ?? '',
-          firstName: document.data['firstName'],
-          lastName: document.data['lastName'],
-          email: document.data['email'],
-          address: document.data['address'],
-          doctorSpeciality: document.data['doctorSpeciality'],
-          gender: document.data['gender'],
-          phone: document.data['phone'],
-          userType: document.data['userType']
-        );
+        KnockUser user = KnockUser(
+            uid: uid,
+            profileImage: image ?? '',
+            firstName: document.data['firstName'],
+            lastName: document.data['lastName'],
+            email: document.data['email'],
+            address: document.data['address'],
+            doctorSpeciality: document.data['doctorSpeciality'],
+            gender: document.data['gender'],
+            phone: document.data['phone'],
+            userType: document.data['userType']);
 
         doctors.add(user);
       }
     }
 
-    Provider.of<DoctorListNotifier>(context, listen: false).setDoctorList(doctors);
+    Provider.of<DoctorListNotifier>(context, listen: false)
+        .setDoctorList(doctors);
   }
 
   /// Get list of home items.
   List<HomeItem> _getHomeItems() {
-    User user = Provider.of<ProfileInfoNotifier>(context, listen: false).user;
-  
-    List<HomeItem> homeItems = List<HomeItem>();
-    if( user == null || user.userType == 'patient' ) {
+    KnockUser user =
+        Provider.of<ProfileInfoNotifier>(context, listen: false).user;
+
+    List<HomeItem> homeItems = [];
+    if (user == null || user.userType == 'patient') {
       homeItems.add(HomeItem(
-          image: 'assets/images/stethoscope.png', title: Strings.CONSULT_DOCTOR));
+          image: 'assets/images/stethoscope.png',
+          title: Strings.CONSULT_DOCTOR));
     }
     homeItems
         .add(HomeItem(image: 'assets/images/music.png', title: Strings.MUSIC));

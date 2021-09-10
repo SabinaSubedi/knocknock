@@ -12,10 +12,9 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final _formKey                  = GlobalKey<FormState>();
-  final FirebaseAuth _auth        = FirebaseAuth.instance;
+  final _formKey = GlobalKey<FormState>();
   final emailTextController = TextEditingController(text: '');
-  final passwordTextController    = TextEditingController(text: '');
+  final passwordTextController = TextEditingController(text: '');
   bool _isObsecure = true;
   bool _isSigningUp = false;
 
@@ -33,22 +32,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Form(
             key: _formKey,
             child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  TextFormField(
-                    controller: emailTextController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration:
-                        const InputDecoration(hintText: Strings.EMAIL),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return Strings.ENTER_SOME_TEXT;
-                      }
-                      return null;
-                    },
-                  ),
-                  Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                TextFormField(
+                  controller: emailTextController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(hintText: Strings.EMAIL),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return Strings.ENTER_SOME_TEXT;
+                    }
+                    return null;
+                  },
+                ),
+                Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -74,48 +72,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           setState(() => _isObsecure = !_isObsecure);
                         },
                       )
-                    ]
+                    ]),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Builder(
+                  builder: (context) => ElevatedButton(
+                    onPressed: () async {
+                      setState(() => _isSigningUp = true);
+
+                      final String email = emailTextController.text.trim();
+                      final String password =
+                          passwordTextController.text.trim();
+
+                      AuthService authService = new AuthService();
+                      try {
+                        await authService.signUp(email, password);
+                        User user = FirebaseAuth.instance.currentUser;
+                        user.sendEmailVerification();
+                        await FirebaseAuth.instance.signOut();
+
+                        final snackbar = SnackBar(
+                            content: Text(Strings.REGISTER_SUCCESSFULLY));
+                        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+
+                        Timer(const Duration(seconds: 2), () {
+                          Navigator.pop(context);
+                        });
+                      } catch (error) {
+                        final snackbar = SnackBar(content: Text(error.message));
+                        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                      }
+
+                      setState(() => _isSigningUp = false);
+                    },
+                    child: _getRegisterButton(),
                   ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  Builder(
-                    builder:(context) => RaisedButton(
-                      onPressed: () async {
-                        setState(() => _isSigningUp = true );
-
-                        final String email = emailTextController.text.trim();
-                        final String password = passwordTextController.text.trim();
-
-                        AuthService authService = new AuthService();
-                        try {
-                          await authService.signUp(email, password);
-                          FirebaseUser user = await  FirebaseAuth.instance.currentUser();
-                          user.sendEmailVerification();
-                          await FirebaseAuth.instance.signOut();
-
-                          final snackbar = SnackBar(
-                            content: Text(Strings.REGISTER_SUCCESSFULLY)
-                          );
-                          Scaffold.of(context).showSnackBar(snackbar);   
-
-                          Timer(const Duration(seconds: 2), () {
-                            Navigator.pop(context);
-                          });        
-                        } catch(error) {
-                          final snackbar = SnackBar(
-                            content: Text(error.message)
-                          );
-                          Scaffold.of(context).showSnackBar(snackbar);           
-                        }
-
-                        setState(() => _isSigningUp = false );
-                      },
-                      child: _getRegisterButton(),
-                      color: Colors.blue,
-                    ),
-                  ),
-                ],
+                ),
+              ],
             ),
           ),
         ),
@@ -124,15 +118,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget _getRegisterButton() {
-    if(_isSigningUp) {
-       return Padding(
+    if (_isSigningUp) {
+      return Padding(
         padding: EdgeInsets.all(10.0),
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         ),
       );
     } else {
-       return Text(
+      return Text(
         Strings.REGISTER,
         style: TextStyle(color: Colors.white),
       );

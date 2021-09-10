@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:medicad/strings.dart';
 
 int currentMoves = 0;
@@ -14,7 +13,6 @@ bool loading = false;
 bool vsBot;
 
 class GamesScreen extends StatefulWidget {
-
   GamesScreen() {
     _resetGame();
     vsBot = true;
@@ -66,30 +64,26 @@ class _BoxContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     _context = context;
     return Container(
-      width: 300,
-      height: 300,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: new Border.all(color: Colors.blue),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue[100],
-            blurRadius: 20.0,
-            spreadRadius: 5.0,
-            offset: Offset(7.0, 7.0)
-          )
-        ]
-      ),
-      child: Center(
-        child: GridView.count(
+        width: 300,
+        height: 300,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: new Border.all(color: Colors.blue),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.blue[100],
+                  blurRadius: 20.0,
+                  spreadRadius: 5.0,
+                  offset: Offset(7.0, 7.0))
+            ]),
+        child: Center(
+            child: GridView.count(
           primary: false,
           crossAxisCount: 3,
           children: List.generate(9, (index) {
             return Box(index);
           }),
-        )
-      )
-    );
+        )));
   }
 }
 
@@ -123,39 +117,37 @@ class _BoxState extends State<Box> {
   @override
   Widget build(context) {
     return MaterialButton(
-      padding: EdgeInsets.all(0),
-      child: Container(
-        decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        border: new Border.all(color: Colors.blue)),
-          child: Center(
-            child: Text(
-              _board[widget.index].toUpperCase(),
-              style: TextStyle(
-                fontSize: 45,
-                fontWeight: FontWeight.bold,
+        padding: EdgeInsets.all(0),
+        child: Container(
+            decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                border: new Border.all(color: Colors.blue)),
+            child: Center(
+              child: Text(
+                _board[widget.index].toUpperCase(),
+                style: TextStyle(
+                  fontSize: 45,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          )
-      ),
-      onPressed: () {
-        if (_board[widget.index] == '') {
-          if (vsBot == false) {
-            if (currentMoves % 2 == 0)
-              _board[widget.index] = 'x';
-            else
+            )),
+        onPressed: () {
+          if (_board[widget.index] == '') {
+            if (vsBot == false) {
+              if (currentMoves % 2 == 0)
+                _board[widget.index] = 'x';
+              else
+                _board[widget.index] = 'o';
+            } else if (!loading) {
+              loading = true;
               _board[widget.index] = 'o';
-          } else if (!loading) {
-            loading = true;
-            _board[widget.index] = 'o';
-            if (currentMoves >= 8) {
-            } else
-              _bestMove(_board);
+              if (currentMoves >= 8) {
+              } else
+                _bestMove(_board);
+            }
+            pressed();
           }
-          pressed();
-        }
-      }
-    );
+        });
   }
 }
 
@@ -169,18 +161,17 @@ class _StatusState extends State<Status> {
   Widget build(BuildContext context) {
     _turnState = this;
     return Card(
-      margin: EdgeInsets.all(40),
-      child: Container(
-        width: 220,
-        height: 60,
-        padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-        child: Text(
-          _turn,
-          style: TextStyle(fontSize: 30),
-          textAlign: TextAlign.center,
-        ),
-      )
-    );
+        margin: EdgeInsets.all(40),
+        child: Container(
+          width: 220,
+          height: 60,
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+          child: Text(
+            _turn,
+            style: TextStyle(fontSize: 30),
+            textAlign: TextAlign.center,
+          ),
+        ));
   }
 }
 
@@ -220,9 +211,9 @@ void _resetGame() {
 
 //------------------------------ Alerts Dialog --------------------------------------
 void awaitfnn() async {
-  if ( 'x' == winner ) {
+  if ('x' == winner) {
     winner = 'Bot';
-  } else if ( '0' == winner ) {
+  } else if ('0' == winner) {
     winner = 'You';
   }
 
@@ -240,29 +231,26 @@ void awaitfnn() async {
 Future<bool> _showAlertBox(BuildContext context, String title, String content,
     String btn1, String btn2) async {
   return showDialog<bool>(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext _context) => AlertDialog(
-      title: Text(title.toUpperCase()),
-      content: Text(content),
-      actions: <Widget>[
-        RaisedButton(
-          color: Colors.white,
-          child: Text(btn1),
-          onPressed: () {
-            Navigator.of(context).pop(false);
-          },
-        ),
-        RaisedButton(
-          color: Colors.white,
-          child: Text(btn2),
-          onPressed: () {
-            Navigator.of(context).pop(true);
-          },
-        )
-      ],
-    )
-  );
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext _context) => AlertDialog(
+            title: Text(title.toUpperCase()),
+            content: Text(content),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text(btn1),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              ElevatedButton(
+                child: Text(btn2),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              )
+            ],
+          ));
 }
 
 awaitfn(String title, String content, String btn1, String btn2) async {

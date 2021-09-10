@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:medicad/model/user.dart';
-import 'package:medicad/notifiers/user.dart';
 import 'package:medicad/notifiers/user_login_status.dart';
-import 'package:medicad/screens/dashboard.dart';
 import 'package:medicad/screens/signup.dart';
 import 'package:medicad/services/auth.dart';
 import 'package:medicad/strings.dart';
@@ -25,8 +22,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    Provider.of<UserLoginStatusNotifier>(context, listen: false).setIsLogginIn(false);
+    Provider.of<UserLoginStatusNotifier>(context, listen: false)
+        .setIsLogginIn(false);
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,8 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: emailTextController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration:
-                      const InputDecoration(hintText: Strings.EMAIL),
+                  decoration: const InputDecoration(hintText: Strings.EMAIL),
                   validator: (value) {
                     if (value.isEmpty) {
                       return Strings.ENTER_SOME_TEXT;
@@ -61,8 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: passwordTextController,
                   keyboardType: TextInputType.phone,
                   obscureText: true,
-                  decoration:
-                      const InputDecoration(hintText: Strings.PASSWORD),
+                  decoration: const InputDecoration(hintText: Strings.PASSWORD),
                   validator: (value) {
                     if (value.isEmpty) {
                       return Strings.ENTER_SOME_TEXT;
@@ -74,56 +71,58 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 10.0,
                 ),
                 Builder(
-                  builder:(context) => RaisedButton(
+                  builder: (context) => ElevatedButton(
                     onPressed: () async {
-                      Provider.of<UserLoginStatusNotifier>(context, listen: false).setIsLogginIn(true);
+                      Provider.of<UserLoginStatusNotifier>(context,
+                              listen: false)
+                          .setIsLogginIn(true);
                       final String email = emailTextController.text.trim();
-                      final String password = passwordTextController.text.trim();
+                      final String password =
+                          passwordTextController.text.trim();
                       try {
                         String message = Strings.LOGGED_IN_SUCCESSFULLY;
                         AuthService authService = new AuthService();
-                        String response = await authService.signIn(email, password);
-                        FirebaseUser user = await FirebaseAuth.instance.currentUser();
-                        if (!user.isEmailVerified) {
+                        await authService.signIn(email, password);
+                        User user = FirebaseAuth.instance.currentUser;
+                        if (!user.emailVerified) {
                           message = 'Please, verify your email !';
                           await FirebaseAuth.instance.signOut();
                         }
 
-                        final snackbar = SnackBar(
-                          content: Text(message)
-                        );
-                        Scaffold.of(context).showSnackBar(snackbar);
-                        Provider.of<UserLoginStatusNotifier>(context, listen: false).setIsLogginIn(false);
-                      } catch(error) {
+                        final snackbar = SnackBar(content: Text(message));
+                        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                        Provider.of<UserLoginStatusNotifier>(context,
+                                listen: false)
+                            .setIsLogginIn(false);
+                      } catch (error) {
                         try {
-                          final snackbar = SnackBar(
-                            content: Text(error.message)
-                          );
-                          Scaffold.of(context).showSnackBar(snackbar);
-                          Provider.of<UserLoginStatusNotifier>(context, listen: false).setIsLogginIn(false);
-                        } catch(error){}
-                      }                   
+                          final snackbar =
+                              SnackBar(content: Text(error.message));
+                          ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                          Provider.of<UserLoginStatusNotifier>(context,
+                                  listen: false)
+                              .setIsLogginIn(false);
+                        } catch (error) {}
+                      }
                     },
                     child: Consumer<UserLoginStatusNotifier>(
                       builder: (context, user, child) {
                         return _getSubmitButtonChild(user.isLoggingIn);
                       },
                     ),
-                    color: Colors.blue,
                   ),
                 ),
                 SizedBox(
                   height: 20.0,
                 ),
-                FlatButton(
+                ElevatedButton(
                   onPressed: () async {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => SignUpScreen()
-                    ));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SignUpScreen()));
                   },
                   child: Text(Strings.CREATE_AN_ACCOUNT),
-                  color: Colors.orange.shade500,
-                  textColor: Colors.white,
                 ),
               ],
             ),

@@ -3,11 +3,11 @@ import 'package:flutter/widgets.dart';
 import 'package:medicad/model/firebase_file.dart';
 
 class MusicListNotifier with ChangeNotifier {
-  List<FirebaseFile> _musiclist = List<FirebaseFile>();
+  List<FirebaseFile> _musiclist = [];
   int _currentMusicIndex = -1;
   AudioPlayerState _audioPlayerState = AudioPlayerState.COMPLETED;
 
-  List<FirebaseFile> get musicList => List.unmodifiable(_musiclist );
+  List<FirebaseFile> get musicList => List.unmodifiable(_musiclist);
 
   int get currentMusicIndex => _currentMusicIndex;
 
